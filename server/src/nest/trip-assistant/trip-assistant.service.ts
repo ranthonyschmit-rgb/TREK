@@ -27,7 +27,7 @@ const MODEL_LABELS: Record<AssistantModelId, { name: string; tag: string }> = {
 /** Earlier messages sent along with each question — keeps cost from snowballing. */
 const HISTORY_TURNS = 16;
 const HISTORY_CHARS_PER_TURN = 2500;
-const MAX_OUTPUT_TOKENS = 2048;
+const MAX_OUTPUT_TOKENS = 4096;
 /** Hard ceiling for one model call, whatever LLM_TIMEOUT_MS says. */
 const MAX_CALL_MS = 120_000;
 /** Per-person cap, a cost guard against a stuck key or runaway clicking. */
@@ -196,6 +196,9 @@ export class TripAssistantService {
       turns,
       maxOutputTokens: MAX_OUTPUT_TOKENS,
       timeoutMs: Math.min(env.llmTimeoutMs, MAX_CALL_MS),
+      // Sonnet rejects "disabled"; "between_tools" turns off up-front thinking
+      // (this assistant uses no tools). Haiku accepts "disabled".
+      anthropicThinking: model === 'sonnet' ? ({ type: 'between_tools' } as const) : ({ type: 'disabled' } as const),
     };
 
     let answer: AssistantMessage;

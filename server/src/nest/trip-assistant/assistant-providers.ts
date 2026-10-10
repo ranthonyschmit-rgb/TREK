@@ -23,6 +23,12 @@ export interface ChatRequest {
   turns: ChatTurn[];
   maxOutputTokens: number;
   timeoutMs: number;
+  /**
+   * Anthropic `thinking` setting. Current Claude models think by default and
+   * that thinking spends the max_tokens budget, which can leave no room for the
+   * answer itself; a chat assistant doesn't need it.
+   */
+  anthropicThinking?: { type: 'disabled' } | { type: 'between_tools' };
 }
 
 /** A provider answered with something other than a usable reply. */
@@ -107,6 +113,7 @@ export async function callAnthropic(req: ChatRequest): Promise<string> {
   const body = {
     model: req.model,
     max_tokens: req.maxOutputTokens,
+    ...(req.anthropicThinking ? { thinking: req.anthropicThinking } : {}),
     system: [
       { type: 'text', text: req.instructions, cache_control: { type: 'ephemeral' } },
       { type: 'text', text: req.context },
@@ -124,8 +131,16 @@ export async function callAnthropic(req: ChatRequest): Promise<string> {
   if (data.stop_reason === 'refusal') {
     throw new AssistantProviderError('Claude refused', "Claude couldn't help with that request.");
   }
-  const text = joinTextParts(data.content).trim();
-  if (!text) throw new AssistantProviderError('Claude answered with no text', 'Claude sent an empty answer. Please try again.');
+  // Only text blocks are shown; thinking blocks (if any) are skipped.
+  const blocks = Array.isArray(data.content) ? data.content.filter((b) => isRecord(b) && b.type === 'text') : [];
+  const text = joinTextParts(blocks).trim();
+  if (!text) {
+    const outOfRoom = data.stop_reason === 'max_tokens';
+    throw new AssistantProviderError(
+      `Claude answered with no text (stop_reason=${String(data.stop_reason)})`,
+      outOfRoom ? 'Claude ran out of room before answering. Try a shorter or more specific question.' : 'Claude sent an empty answer. Please try again.',
+    );
+  }
   return text;
 }
 
@@ -134,7 +149,11 @@ export async function callGemini(req: ChatRequest): Promise<string> {
   const body = {
     systemInstruction: { parts: [{ text: `${req.instructions}\n\n${req.context}` }] },
     contents: turns.map((t) => ({ role: t.role === 'assistant' ? 'model' : 'user', parts: [{ text: t.text }] })),
-    generationConfig: { maxOutputTokens: req.maxOutputTokens },
+    generationConfig: {
+      maxOutputTokens: req.maxOutputTokens,
+      // Gemini 2.5 Flash thinks by default and that also eats the output budget.
+      ...(req.model.startsWith('gemini-2.5-flash') ? { thinkingConfig: { thinkingBudget: 0 } } : {}),
+    },
   };
   const data = await postJson(
     `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(req.model)}:generateContent`,
