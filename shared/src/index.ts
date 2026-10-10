@@ -94,3 +94,6 @@ export * from './roadtrip/google-import.schema';
 export * from './roadtrip/charging.schema';
 
 export * from './vacay/school-holiday-catalog.schema';
+
+// Fork addition: AI trip assistant + per-trip currency converter contracts.
+export * from './assistant/assistant.schema';

@@ -96,6 +96,8 @@ concurrency:
 
 jobs:
   plugin-facts:
+    # Fork: upstream's full CI (needs Sonar/MinIO secrets); skipped here. build-fork.yml checks this fork.
+    if: github.repository == 'liketrek/TREK'
     name: Plugin Permission Facts
     runs-on: ubuntu-latest
     steps:
@@ -123,6 +125,8 @@ jobs:
         run: cd server && npm run check:plugin-facts
 
   i18n-parity:
+    # Fork: upstream's full CI (needs Sonar/MinIO secrets); skipped here. build-fork.yml checks this fork.
+    if: github.repository == 'liketrek/TREK'
     name: i18n Key Parity
     runs-on: ubuntu-latest
 
@@ -137,6 +141,8 @@ jobs:
         run: node shared/scripts/i18n-parity.mjs --strict
 
   server-quality:
+    # Fork: upstream's full CI (needs Sonar/MinIO secrets); skipped here. build-fork.yml checks this fork.
+    if: github.repository == 'liketrek/TREK'
     name: Server Types & Lint
     runs-on: ubuntu-latest
     steps:
@@ -184,6 +190,8 @@ jobs:
         run: cd server && npm run lint:check
 
   client-quality:
+    # Fork: upstream's full CI (needs Sonar/MinIO secrets); skipped here. build-fork.yml checks this fork.
+    if: github.repository == 'liketrek/TREK'
     name: Client Types & Lint
     runs-on: ubuntu-latest
 
@@ -212,6 +220,8 @@ jobs:
         run: cd client && npm run lint:pages
 
   plugin-sdk-quality:
+    # Fork: upstream's full CI (needs Sonar/MinIO secrets); skipped here. build-fork.yml checks this fork.
+    if: github.repository == 'liketrek/TREK'
     name: Plugin SDK Types
     runs-on: ubuntu-latest
     defaults:

@@ -158,6 +158,16 @@ const budget: TranslationStrings = {
   'costs.deleteReceipt': 'Remove receipt',
   'costs.viewReceipt': 'View receipt',
   'costs.receiptLeftBehind': 'Save failed, and {count} uploaded receipts are still there. Remove them in the Files tab.',
+  // ── Trip currency converter (fork addition) ──
+  'tripFx.title': 'Currency',
+  'tripFx.from': 'From',
+  'tripFx.to': 'To',
+  'tripFx.noDestinations': 'Add a destination to this trip to see currency conversions.',
+  'tripFx.domestic': 'This trip’s destinations use US dollars, so there’s nothing to convert.',
+  'tripFx.other': 'Other currency…',
+  'tripFx.rateUnavailable': 'Rate unavailable',
+  'tripFx.refresh': 'Refresh rates',
+  'tripFx.rate': '1 {from} = {rate} {to}',
 };
 
 export default budget;

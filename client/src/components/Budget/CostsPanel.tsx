@@ -29,6 +29,7 @@ import type { TripMember } from './BudgetPanelMemberChips'
 import GuestBadge from '../shared/GuestBadge'
 import { NumericInput } from '../shared/NumericInput'
 import EmptyState from '../shared/EmptyState'
+import TripCurrencyConverter from './TripCurrencyConverter'
 
 interface CostsPanelProps {
   tripId: number
@@ -504,6 +505,8 @@ export default function CostsPanel({ tripId, tripMembers = [] }: CostsPanelProps
 
         {/* sidebar */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {/* Fork: trip currency converter (USD → the destinations' currencies). */}
+          <TripCurrencyConverter tripId={tripId} />
           {/* settle up */}
           <div className={cardCls} style={{ borderRadius: 22, padding: '22px 24px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
@@ -666,6 +669,9 @@ export default function CostsPanel({ tripId, tripMembers = [] }: CostsPanelProps
             </button>
           )}
         </section>
+
+        {/* Fork: trip currency converter (USD → the destinations' currencies). */}
+        <TripCurrencyConverter tripId={tripId} />
 
         {/* Owe / Owed */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>

@@ -183,6 +183,35 @@ export const DEFAULT_APPEARANCE: AppearanceConfig = {
   mobileNav: DEFAULT_MOBILE_NAV,
 };
 
+// Fork customization: this build focuses the dashboard on planning, so the
+// travel-stats tiles and the currency / time-zone / upcoming-reservation
+// widgets are always off, whatever an older stored config says. (Currency
+// conversion lives inside each trip instead.)
+type DashboardWidgets = z.infer<typeof dashboardWidgetsSchema>;
+export function withoutRemovedDashboardWidgets(d: DashboardWidgets): DashboardWidgets {
+  return {
+    ...d,
+    desktop: {
+      ...d.desktop,
+      currency: false,
+      timezones: false,
+      upcomingReservations: false,
+      atlas: false,
+      tripsTotal: false,
+      daysTraveled: false,
+      distanceFlown: false,
+    },
+    mobile: {
+      ...d.mobile,
+      tripsTotal: false,
+      daysTraveled: false,
+      currency: false,
+      timezones: false,
+      upcomingReservations: false,
+    },
+  };
+}
+
 /**
  * Coerce any stored/posted value into a valid AppearanceConfig. Never throws:
  * a non-object, partial, malformed, or future-versioned blob degrades to the
@@ -202,6 +231,7 @@ export function normalizeAppearance(raw: unknown): AppearanceConfig {
   const more = dedupe(cfg.mobileNav.more).filter((id) => !barSet.has(id));
   return {
     ...cfg,
+    dashboard: withoutRemovedDashboardWidgets(cfg.dashboard),
     fontScale: clampScale(cfg.fontScale),
     typeScale: {
       title: clampScale(cfg.typeScale.title),

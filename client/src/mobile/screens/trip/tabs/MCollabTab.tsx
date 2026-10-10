@@ -1,10 +1,11 @@
 import type { LucideIcon } from 'lucide-react'
-import { BarChart3, Link2, MessageCircle, StickyNote } from 'lucide-react'
+import { Bot, Link2, MessageCircle, StickyNote } from 'lucide-react'
 import type { MTabScreenProps } from './tabModel'
 import { TabScroller } from './tabChrome'
 import MCollabChat from './MCollabChat'
 import MCollabNotes from './MCollabNotes'
-import MCollabPolls from './MCollabPolls'
+import TripAssistant from '../../../../components/Collab/TripAssistant'
+import { useAuthStore } from '../../../../store/authStore'
 import CollabLinks from '../../../../components/Collab/CollabLinks'
 
 /**
@@ -27,6 +28,7 @@ import CollabLinks from '../../../../components/Collab/CollabLinks'
  */
 export default function MCollabTab({ planner, shell }: MTabScreenProps) {
   const { t } = planner
+  const user = useAuthStore((s) => s.user)
   const label = t('mobileTrip.collabFeatureDisabled')
 
   if (shell.collabTab === 'chat') {
@@ -72,11 +74,18 @@ export default function MCollabTab({ planner, shell }: MTabScreenProps) {
     if (!planner.collabFeatures.polls) {
       return (
         <TabScroller>
-          <CollabDisabledNotice icon={BarChart3} label={label} />
+          <CollabDisabledNotice icon={Bot} label={label} />
         </TabScroller>
       )
     }
-    return <MCollabPolls planner={planner} />
+    // Fork: the polls slot holds the AI trip assistant.
+    return (
+      <TabScroller>
+        <div className="h-[72vh] overflow-hidden rounded-[18px] bg-[color:var(--m-card)]">
+          <TripAssistant tripId={planner.tripId} currentUser={user} />
+        </div>
+      </TabScroller>
+    )
   }
 
   return null

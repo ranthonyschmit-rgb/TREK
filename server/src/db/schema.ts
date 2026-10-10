@@ -613,6 +613,22 @@ function createTables(db: Database.Database): void {
     CREATE INDEX IF NOT EXISTS idx_ncp_user ON notification_channel_preferences(user_id);
 
     CREATE TABLE IF NOT EXISTS migrations (id integer PRIMARY KEY AUTOINCREMENT NOT NULL, timestamp bigint NOT NULL, name varchar NOT NULL);
+
+    -- Fork addition: the shared AI trip assistant chat on the Collab page.
+    -- Kept here (idempotent, runs every boot) rather than as a positional
+    -- migration so it can never collide with upstream's migration numbering.
+    CREATE TABLE IF NOT EXISTS trip_assistant_messages (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      trip_id INTEGER NOT NULL REFERENCES trips(id) ON DELETE CASCADE,
+      user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+      role TEXT NOT NULL CHECK (role IN ('user', 'assistant')),
+      model TEXT,
+      content TEXT NOT NULL,
+      suggestions TEXT,
+      is_error INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now'))
+    );
+    CREATE INDEX IF NOT EXISTS idx_trip_assistant_messages_trip ON trip_assistant_messages(trip_id, id);
   `);
 }
 

@@ -90,6 +90,8 @@ const FIXTURES: Record<TrekWsEventName, Record<string, unknown>> = {
   'collab:message:created': { message: { id: 14 } },
   'collab:message:reacted': { messageId: 14, reactions: { '👍': [1] } },
   'collab:message:deleted': { messageId: 14, username: 'ana' },
+  'assistant:message:created': { message: { id: 1 } },
+  'assistant:cleared': {},
   'memories:updated': { userId: 1 },
   'notification:new': { notification: { id: 21, sender_username: 'ana' } },
   'notification:updated': { notification: { id: 21 } },

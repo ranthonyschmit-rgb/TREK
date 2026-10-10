@@ -33,6 +33,7 @@ import {
   type CostsCtx, type CostsSegment, type CostsSettlement, type CostsSettlementResponse,
 } from './costsModel'
 import type { BudgetParticipantFinal } from '@trek/shared'
+import TripCurrencyConverter from '../../../../components/Budget/TripCurrencyConverter'
 import type { BudgetItem, BudgetItemReceipt, TripMember } from '../../../../types'
 
 type TFn = (key: string, params?: Record<string, string | number>) => string
@@ -204,6 +205,9 @@ export default function MCostsTab({ planner, shell }: MTabScreenProps) {
           <span>{t('costs.youPaid')} · <b style={{ color: '#F5F5F7' }}>{formatMoney(totals.myPaid, base, locale)}</b></span>
         </div>
       </div>
+
+      {/* Fork: trip currency converter (USD → the destinations' currencies). */}
+      <TripCurrencyConverter tripId={Number(tripId)} className="mt-[10px]" style={{ borderRadius: 20, padding: 14 }} />
 
       {/* You owe / You're owed (spec §3.2) */}
       <div className="mt-[10px] flex gap-2">

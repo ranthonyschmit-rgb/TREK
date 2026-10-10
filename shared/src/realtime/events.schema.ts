@@ -264,6 +264,10 @@ export const TREK_WS_EVENTS = {
     payload: z.object({ messageId: id, username: z.string().nullish() }),
   },
 
+  // ── Trip assistant (fork addition) ──────────────────────────────────────
+  'assistant:message:created': { scope: 'trip', payload: z.object({ message: entity }) },
+  'assistant:cleared': { scope: 'trip', payload: empty },
+
   // ── Memories ─────────────────────────────────────────────────────────────
   'memories:updated': { scope: 'trip', payload: z.object({ userId: id }) },
 

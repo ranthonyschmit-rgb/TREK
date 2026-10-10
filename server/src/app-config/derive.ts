@@ -289,6 +289,15 @@ export function deriveIntegrations(raw: RawEnv) {
      * rejects a fractional value.
      */
     llmTimeoutMs: Math.floor(positiveNumberOr(raw.LLM_TIMEOUT_MS, 900_000)),
+    // Fork addition: the Collab-page trip assistant. Keys are read server-side
+    // only and never sent to the browser; a blank key hides that model.
+    assistant: {
+      anthropicApiKey: raw.ANTHROPIC_API_KEY?.trim() || undefined,
+      geminiApiKey: raw.GEMINI_API_KEY?.trim() || undefined,
+      sonnetModel: raw.ASSISTANT_SONNET_MODEL?.trim() || 'claude-sonnet-5-5',
+      haikuModel: raw.ASSISTANT_HAIKU_MODEL?.trim() || 'claude-haiku-5-5',
+      geminiModel: raw.ASSISTANT_GEMINI_MODEL?.trim() || 'gemini-2.5-flash',
+    },
     // Windows spells it Path; every other platform PATH. Split here so callers
     // get a list and never re-implement the delimiter.
     searchPath: (raw.PATH || raw.Path || '')

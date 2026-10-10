@@ -161,7 +161,9 @@ const MUTATING_METHODS = new Set(['post', 'put', 'patch', 'delete'])
 apiClient.interceptors.request.use(
     (config) => {
       const sid = getSocketId()
-      if (sid) {
+      // A caller that set the header itself keeps it (the trip assistant sends
+      // a non-matching id so its own tab also receives the note/place broadcast).
+      if (sid && !config.headers['X-Socket-Id']) {
         config.headers['X-Socket-Id'] = sid
       }
       // Attach a per-request idempotency key to all write operations so the

@@ -53,12 +53,10 @@ const WIDGET_LABELS: Record<string, string> = {
 // has a master toggle (off → no sidebar, layout centers); its individual
 // widgets only matter while the sidebar is shown.
 const DESKTOP_GROUPS: { id: string; fallback: string; master?: DesktopWidgetKey; keys: DesktopWidgetKey[] }[] = [
-  { id: 'belowHero', fallback: 'Below the hero', keys: ['atlas', 'tripsTotal', 'daysTraveled', 'distanceFlown'] },
-  { id: 'rightSidebar', fallback: 'Right sidebar', master: 'sidebar', keys: ['currency', 'collections', 'timezones', 'upcomingReservations'] },
+  { id: 'rightSidebar', fallback: 'Right sidebar', master: 'sidebar', keys: ['collections'] },
 ]
 const MOBILE_GROUPS: { id: string; fallback: string; keys: MobileWidgetKey[] }[] = [
-  { id: 'belowHero', fallback: 'Below the hero', keys: ['tripsTotal', 'daysTraveled'] },
-  { id: 'bottomOfPage', fallback: 'Bottom of page', keys: ['currency', 'collections', 'timezones', 'upcomingReservations'] },
+  { id: 'bottomOfPage', fallback: 'Bottom of page', keys: ['collections'] },
 ]
 
 // shared segmented-button style (matches DisplaySettingsTab)

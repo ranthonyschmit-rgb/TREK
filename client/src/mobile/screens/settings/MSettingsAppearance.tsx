@@ -41,12 +41,10 @@ type DesktopWidgetKey = keyof AppearanceConfig['dashboard']['desktop']
 type MobileWidgetKey = keyof AppearanceConfig['dashboard']['mobile']
 
 const DESKTOP_GROUPS: { id: string; master?: DesktopWidgetKey; keys: DesktopWidgetKey[] }[] = [
-  { id: 'belowHero', keys: ['atlas', 'tripsTotal', 'daysTraveled', 'distanceFlown'] },
-  { id: 'rightSidebar', master: 'sidebar', keys: ['currency', 'collections', 'timezones', 'upcomingReservations'] },
+  { id: 'rightSidebar', master: 'sidebar', keys: ['collections'] },
 ]
 const MOBILE_GROUPS: { id: string; keys: MobileWidgetKey[] }[] = [
-  { id: 'belowHero', keys: ['tripsTotal', 'daysTraveled'] },
-  { id: 'bottomOfPage', keys: ['currency', 'collections', 'timezones', 'upcomingReservations'] },
+  { id: 'bottomOfPage', keys: ['collections'] },
 ]
 
 function SliderRow({ label, sub, value, onChange }: { label: string; sub?: string; value: number; onChange: (v: number) => void }) {

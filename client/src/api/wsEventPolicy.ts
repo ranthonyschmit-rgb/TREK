@@ -30,6 +30,9 @@ export const HANDLED_OUTSIDE_TRIP_STORE = [
   'collab:message:created',
   'collab:message:reacted',
   'collab:message:deleted',
+  // Trip assistant (fork) — components/Collab/useTripAssistant
+  'assistant:message:created',
+  'assistant:cleared',
   // Road trip shaping — components/Roadtrip/useRoadtripVias. The points a drive is
   // routed through live in that hook and nowhere else; a store slice for them would be a
   // second copy of the same list to keep in step.

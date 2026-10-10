@@ -1,10 +1,10 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useAuthStore } from '../../store/authStore'
 import { useTranslation } from '../../i18n'
-import { MessageCircle, StickyNote, Link2, BarChart3, Sparkles } from 'lucide-react'
+import { MessageCircle, StickyNote, Link2, Bot, Sparkles } from 'lucide-react'
 import CollabChat from './CollabChat'
 import CollabNotes from './CollabNotes'
-import CollabPolls from './CollabPolls'
+import TripAssistant from './TripAssistant'
 import WhatsNextWidget from './WhatsNextWidget'
 import CollabLinks from './CollabLinks'
 
@@ -44,7 +44,8 @@ const ALL_TABS = [
   { id: 'chat', featureKey: 'chat' as const, labelKey: 'collab.tabs.chat', fallback: 'Chat', icon: MessageCircle },
   { id: 'notes', featureKey: 'notes' as const, labelKey: 'collab.tabs.notes', fallback: 'Notes', icon: StickyNote },
   { id: 'links', featureKey: 'links' as const, labelKey: 'collab.tabs.links', fallback: 'Links', icon: Link2 },
-  { id: 'polls', featureKey: 'polls' as const, labelKey: 'collab.tabs.polls', fallback: 'Polls', icon: BarChart3 },
+  // Fork: the 'polls' slot (and its admin toggle) now holds the AI trip assistant.
+  { id: 'polls', featureKey: 'polls' as const, labelKey: 'collab.tabs.polls', fallback: 'Assistant', icon: Bot },
   { id: 'next', featureKey: 'whatsnext' as const, labelKey: 'collab.whatsNext.title', fallback: "What's Next", icon: Sparkles },
 ]
 
@@ -87,13 +88,14 @@ export default function CollabPanel({ tripId, tripMembers = [], collabFeatures }
     <>
       {p === 'notes' && <CollabNotes tripId={tripId} currentUser={user} />}
       {p === 'links' && <CollabLinks tripId={tripId} />}
-      {p === 'polls' && <CollabPolls tripId={tripId} currentUser={user} />}
+      {p === 'polls' && <TripAssistant tripId={tripId} currentUser={user} />}
       {p === 'whatsnext' && <WhatsNextWidget tripMembers={tripMembers} />}
     </>
   )
   const panelRow = (ids: string[]) => (
     <div style={{ flex: 1, display: 'flex', gap: 12, minHeight: 0 }}>
-      {ids.map(p => <div key={p} className={cardClass} style={{ flex: 1, minWidth: 0 }}>{renderPanel(p)}</div>)}
+      {/* The assistant gets the larger share of its row: answers are long. */}
+      {ids.map(p => <div key={p} className={cardClass} style={{ flex: p === 'polls' ? 2 : 1, minWidth: 0 }}>{renderPanel(p)}</div>)}
     </div>
   )
 
@@ -178,7 +180,7 @@ export default function CollabPanel({ tripId, tripMembers = [], collabFeatures }
         {mobileTab === 'chat' && features.chat && <CollabChat tripId={tripId} currentUser={user} />}
         {mobileTab === 'notes' && features.notes && <CollabNotes tripId={tripId} currentUser={user} />}
         {mobileTab === 'links' && features.links && <CollabLinks tripId={tripId} />}
-        {mobileTab === 'polls' && features.polls && <CollabPolls tripId={tripId} currentUser={user} />}
+        {mobileTab === 'polls' && features.polls && <TripAssistant tripId={tripId} currentUser={user} />}
         {mobileTab === 'next' && features.whatsnext && <WhatsNextWidget tripMembers={tripMembers} />}
       </div>
     </div>

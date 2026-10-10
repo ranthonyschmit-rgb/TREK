@@ -112,6 +112,12 @@ export const envSchema = z.object({
 
   // Integrations
   UNSPLASH_ACCESS_KEY: anyString,
+  // Fork addition: trip assistant provider keys + optional model overrides.
+  ANTHROPIC_API_KEY: anyString,
+  GEMINI_API_KEY: anyString,
+  ASSISTANT_SONNET_MODEL: anyString,
+  ASSISTANT_HAIKU_MODEL: anyString,
+  ASSISTANT_GEMINI_MODEL: anyString,
   TRANSIT_API_URL: url,
   NOMINATIM_URL: url,
   // OVERPASS_URL accepts a comma-separated endpoint list and silently drops
