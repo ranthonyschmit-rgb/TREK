@@ -104,6 +104,7 @@ const collab: TranslationStrings = {
   'collab.chat.closeImage': 'Close image',
   // ── Trip assistant (fork addition; replaces Polls on the Collab page) ──
   'assistant.title': 'Trip Assistant',
+  'assistant.tabShort': 'AI',
   'assistant.subtitle': 'Brainstorm and plan with AI. Everyone on the trip sees this chat.',
   'assistant.placeholder': 'Ask for ideas, a day plan, restaurants…',
   'assistant.send': 'Send',

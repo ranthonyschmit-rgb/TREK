@@ -1,11 +1,10 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useAuthStore } from '../../store/authStore'
 import { useTranslation } from '../../i18n'
-import { MessageCircle, StickyNote, Link2, Bot, Sparkles } from 'lucide-react'
+import { MessageCircle, StickyNote, Link2, Bot } from 'lucide-react'
 import CollabChat from './CollabChat'
 import CollabNotes from './CollabNotes'
 import TripAssistant from './TripAssistant'
-import WhatsNextWidget from './WhatsNextWidget'
 import CollabLinks from './CollabLinks'
 
 function useIsDesktop(breakpoint = 1024) {
@@ -46,10 +45,9 @@ const ALL_TABS = [
   { id: 'links', featureKey: 'links' as const, labelKey: 'collab.tabs.links', fallback: 'Links', icon: Link2 },
   // Fork: the 'polls' slot (and its admin toggle) now holds the AI trip assistant.
   { id: 'polls', featureKey: 'polls' as const, labelKey: 'collab.tabs.polls', fallback: 'Assistant', icon: Bot },
-  { id: 'next', featureKey: 'whatsnext' as const, labelKey: 'collab.whatsNext.title', fallback: "What's Next", icon: Sparkles },
 ]
 
-export default function CollabPanel({ tripId, tripMembers = [], collabFeatures }: CollabPanelProps) {
+export default function CollabPanel({ tripId, collabFeatures }: CollabPanelProps) {
   const { user } = useAuthStore()
   const { t } = useTranslation()
   const isDesktop = useIsDesktop()
@@ -74,79 +72,48 @@ export default function CollabPanel({ tripId, tripMembers = [], collabFeatures }
     }
   }, [tabs, mobileTab])
 
-  const chatOn = features.chat
-  const rightPanels = [
-    features.notes && 'notes', features.links && 'links',
-    features.polls && 'polls',
-    features.whatsnext && 'whatsnext',
-  ].filter(Boolean) as string[]
+  // Fork layout (desktop): three full-height columns — chat 20%, notes and
+  // links sharing one box 40%, trip assistant 40%. What's Next is dropped.
+  // A column whose feature is off is left out and the rest share its space.
+  const writtenOn = features.notes || features.links
+  const columns = [
+    features.chat && { id: 'chat', flex: 2 },
+    writtenOn && { id: 'written', flex: 4 },
+    features.polls && { id: 'assistant', flex: 4 },
+  ].filter(Boolean) as { id: string; flex: number }[]
 
-  // One place decides what a panel id renders. It was spelled out at five call
-  // sites, and the layout branch below dropped a panel precisely because one of
-  // those copies did not list it.
-  const renderPanel = (p: string) => (
-    <>
-      {p === 'notes' && <CollabNotes tripId={tripId} currentUser={user} />}
-      {p === 'links' && <CollabLinks tripId={tripId} />}
-      {p === 'polls' && <TripAssistant tripId={tripId} currentUser={user} />}
-      {p === 'whatsnext' && <WhatsNextWidget tripMembers={tripMembers} />}
-    </>
-  )
-  const panelRow = (ids: string[]) => (
-    <div style={{ flex: 1, display: 'flex', gap: 12, minHeight: 0 }}>
-      {/* The assistant gets the larger share of its row: answers are long. */}
-      {ids.map(p => <div key={p} className={cardClass} style={{ flex: p === 'polls' ? 2 : 1, minWidth: 0 }}>{renderPanel(p)}</div>)}
-    </div>
-  )
+  const renderColumn = (id: string) => {
+    if (id === 'chat') return <CollabChat tripId={tripId} currentUser={user} />
+    if (id === 'assistant') return <TripAssistant tripId={tripId} currentUser={user} />
+    // Notes and links in one box: links sized to their content (capped, scrolls
+    // on its own), notes fill the rest.
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0 }}>
+        {features.links && (
+          <div style={{ flex: features.notes ? '0 1 auto' : 1, maxHeight: features.notes ? '38%' : undefined, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+            <CollabLinks tripId={tripId} compact={features.notes} />
+          </div>
+        )}
+        {features.links && features.notes && <div className="border-t border-edge-faint" style={{ margin: '0 12px' }} />}
+        {features.notes && (
+          <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+            <CollabNotes tripId={tripId} currentUser={user} />
+          </div>
+        )}
+      </div>
+    )
+  }
 
   if (tabs.length === 0) return null
 
   if (isDesktop) {
-    // Chat always 380px fixed when on. Right panels share remaining space.
-    // If chat off, all panels share full width equally.
-    if (chatOn && rightPanels.length === 0) {
-      // Only chat
-      return (
-        <div style={{ height: '100%', display: 'flex', gap: 12, padding: 12, overflow: 'hidden', minHeight: 0 }}>
-          <div className={cardClass} style={{ flex: 1 }}>
-            <CollabChat tripId={tripId} currentUser={user} />
-          </div>
-        </div>
-      )
-    }
-
-    if (chatOn) {
-      // Chat left (380px) + right panels
-      return (
-        <div style={{ height: '100%', display: 'flex', gap: 12, padding: 12, overflow: 'hidden', minHeight: 0 }}>
-          <div className={cardClass} style={{ flex: '0 0 380px' }}>
-            <CollabChat tripId={tripId} currentUser={user} />
-          </div>
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12, overflow: 'hidden', minHeight: 0 }}>
-            {rightPanels.length <= 2 && panelRow(rightPanels)}
-            {rightPanels.length >= 3 && (() => {
-              // Two rows, split by kind rather than by a pair being present:
-              // the old condition needed notes AND links together, so turning
-              // the new Links feature off dropped Notes out of the layout
-              // entirely. Each row renders only when it has something in it.
-              const written = rightPanels.filter(p => p === 'notes' || p === 'links')
-              const rest = rightPanels.filter(p => p !== 'notes' && p !== 'links')
-              return <>
-                {written.length > 0 && panelRow(written)}
-                {rest.length > 0 && panelRow(rest)}
-              </>
-            })()}
-          </div>
-        </div>
-      )
-    }
-
-    // Chat off — remaining panels share full width
-    const panels = rightPanels
+    if (columns.length === 0) return null
     return (
       <div style={{ height: '100%', display: 'flex', gap: 12, padding: 12, overflow: 'hidden', minHeight: 0 }}>
-        {panels.map(p => (
-          <div key={p} className={cardClass} style={{ flex: 1 }}>{renderPanel(p)}</div>
+        {columns.map(c => (
+          <div key={c.id} className={cardClass} style={{ flex: `${c.flex} 1 0`, minWidth: c.id === 'chat' ? 280 : 0 }}>
+            {renderColumn(c.id)}
+          </div>
         ))}
       </div>
     )
@@ -181,7 +148,6 @@ export default function CollabPanel({ tripId, tripMembers = [], collabFeatures }
         {mobileTab === 'notes' && features.notes && <CollabNotes tripId={tripId} currentUser={user} />}
         {mobileTab === 'links' && features.links && <CollabLinks tripId={tripId} />}
         {mobileTab === 'polls' && features.polls && <TripAssistant tripId={tripId} currentUser={user} />}
-        {mobileTab === 'next' && features.whatsnext && <WhatsNextWidget tripMembers={tripMembers} />}
       </div>
     </div>
   )

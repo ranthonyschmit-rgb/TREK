@@ -628,7 +628,8 @@ export default function MTripShell({
               { value: 'chat' as const, label: t('collab.tabs.chat') },
               { value: 'notes' as const, label: t('collab.tabs.notes') },
               { value: 'links' as const, label: t('collab.tabs.links') || 'Links' },
-              { value: 'polls' as const, label: t('collab.tabs.polls') },
+              // Fork: the polls slot holds the trip assistant; a short label keeps four chips on a phone header.
+              { value: 'polls' as const, label: t('assistant.tabShort') },
             ]).map(seg => (
               <button
                 key={seg.value}

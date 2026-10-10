@@ -104,7 +104,12 @@ function LinkModal({ link, onClose, onSave }: { link?: CollabLink; onClose: () =
   )
 }
 
-export default function CollabLinks({ tripId }: { tripId: number }) {
+/**
+ * `compact` (fork): used when links share a box with Notes — the panel sizes to
+ * its content instead of filling the card, and an empty list is one quiet line
+ * rather than the full mascot empty state.
+ */
+export default function CollabLinks({ tripId, compact = false }: { tripId: number; compact?: boolean }) {
   const { t } = useTranslation()
   const trip = useTripStore(s => s.trip)
   const canEdit = useCanDo()('collab_edit', trip)
@@ -204,7 +209,7 @@ export default function CollabLinks({ tripId }: { tripId: number }) {
   }
 
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', fontFamily: FONT }}>
+    <div style={{ height: compact ? 'auto' : '100%', maxHeight: '100%', minHeight: 0, display: 'flex', flexDirection: 'column', fontFamily: FONT }}>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 16px', flexShrink: 0 }}>
         <h3 style={{ margin: 0, fontSize: 'calc(12px * var(--fs-scale-body, 1))', fontWeight: 600, color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 7, letterSpacing: 0.3, textTransform: 'uppercase' }}>
@@ -226,7 +231,9 @@ export default function CollabLinks({ tripId }: { tripId: number }) {
           the link, with the host beside the title; the actions sit in its tail. */}
       <div className="chat-scroll collab-link-grid" style={{ flex: 1, overflowY: 'auto', padding: '2px 12px 12px' }}>
         {links.length === 0 ? (
-          <EmptyState scene="links" title={t('collab.links.empty')} />
+          compact
+            ? <div className="text-content-faint" style={{ padding: '2px 4px 4px', fontSize: 'calc(12px * var(--fs-scale-body, 1))' }}>{t('collab.links.empty')}</div>
+            : <EmptyState scene="links" title={t('collab.links.empty')} />
         ) : (
           <div className="collab-link-grid__cells">
             {links.map(link => (
