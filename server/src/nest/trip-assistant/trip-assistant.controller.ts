@@ -37,7 +37,7 @@ export class TripAssistantController {
     @Headers('x-socket-id') socketId?: string,
   ): Promise<AssistantSendResponse> {
     const result = await this.assistant.send(tripId, user, body.text, body.model, socketId);
-    if (!result.ok) {
+    if ('error' in result) {
       if (result.error === 'model_unavailable') {
         throw new HttpException({ error: 'That model is not set up on this server. Add its API key to the container settings.' }, 400);
       }
